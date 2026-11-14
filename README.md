@@ -1,10 +1,18 @@
-# W3 A2 — Connect the CRUD API to SQLite
+# My task API with SQLite
 
-This standalone version keeps the A1 routes and stores tasks in `tasks.db` using Python's built-in `sqlite3`. It creates the database/table on startup, inserts three examples only when the table is empty, and uses bound `?` parameters for SQL values. Filtering, search, and task counts are also performed in SQL.
+For this assignment, I took the task API I started in Project 1 and gave it persistent storage. I used Python's built-in `sqlite3` module, so I didn't need to run a separate database server. When I stop and start the API, the tasks stay in `tasks.db` instead of disappearing with the process.
 
-## Run
+## What I changed
 
-From this folder with Python 3.10 or newer:
+- Kept the task API routes from Project 1
+- Created the SQLite database and table when the app starts
+- Added three starter tasks only when the database is empty
+- Used parameterized SQL values for searches and updates
+- Added filtering, search, and task counts using SQL
+
+## How I run it
+
+From this project folder, I create an environment, install the dependencies, and start the API:
 
 ```bash
 python -m venv .venv
@@ -13,23 +21,50 @@ pip install -r requirements.txt
 python -m uvicorn main:app --reload
 ```
 
-Open <http://localhost:8000/docs>. The database is created beside `main.py`; set `TASKS_DB_PATH` to choose another location. `tasks.db` is ignored by Git so a clean checkout creates its own seed data.
+I can try the routes in Swagger at <http://localhost:8000/docs>. By default, the database file is created beside `main.py`. I can set `TASKS_DB_PATH` if I want it somewhere else. The generated `tasks.db` file is ignored by Git.
 
-## Endpoints
+## Routes
 
-The same routes as A1: `GET /`, `GET /health`, `GET /tasks`, `GET /tasks/{id}`, `POST /tasks`, `PUT /tasks/{id}`, `DELETE /tasks/{id}`, and the optional `GET /stats`. Error bodies use `{"error":"..."}`. Search and filters use parameterized SQLite queries.
+| Method | Path | What I use it for |
+| --- | --- | --- |
+| GET | `/` | Check the API name and version |
+| GET | `/health` | Check that the API and database are available |
+| GET | `/tasks` | List tasks, optionally filtering by `done` or `search` |
+| GET | `/tasks/{id}` | Get one task |
+| POST | `/tasks` | Create a task, for example `{"title":"Write README"}` |
+| PUT | `/tasks/{id}` | Update a task's `title`, `done` value, or both |
+| DELETE | `/tasks/{id}` | Delete a task |
+| GET | `/stats` | Count all, completed, and open tasks |
 
-## Persistence checkpoint
+The API returns JSON error messages for invalid input and missing task IDs. The task data is stored in SQLite using parameterized queries.
+
+## How I check persistence
+
+With the server running, I create a task and list the tasks:
 
 ```bash
-curl -i http://localhost:8000/tasks
-curl -i -X POST http://localhost:8000/tasks -H 'Content-Type: application/json' -d '{"title":"Survives restart"}'
-# Stop and restart uvicorn, then list tasks again:
+curl -i -X POST http://localhost:8000/tasks \
+  -H 'Content-Type: application/json' \
+  -d '{"title":"SQLite persistence test"}'
+
 curl -i http://localhost:8000/tasks
 ```
 
-Open `tasks.db` with DB Browser for SQLite and capture a screenshot for your submission. Paste a real SQL query and its observed result into this README after you run it. The A1 endpoint checks should work unchanged: that is evidence the API contract survived a storage change.
+Then I stop the server with `Ctrl+C`, start it again using the Uvicorn command above, and list the tasks once more:
 
-## Assignment steps
+```bash
+curl -i http://localhost:8000/tasks
+```
 
-Suggested commits: create SQLite database; database read endpoints; insert; update/delete; explore SQL in DB Browser; document and publish. The optional AI rematch must stay in its own folder or branch and needs your own comparison. A public GitHub repo, the DB Browser screenshot, real curl output, and honest commit history remain submission steps.
+I expect to find “SQLite persistence test” after the restart. I also plan to open `tasks.db` in DB Browser for SQLite and inspect the `tasks` table. After I run these checks, I’ll record the actual responses and a query I tried; I haven’t filled in results I haven’t observed yet.
+
+## Test screenshot
+
+I’ll place my screenshot here after I run the persistence check and inspect the database in DB Browser for SQLite.
+
+<!-- Add the screenshot here as assets/a2-sqlite-test.png when it is available in this project folder. -->
+
+## What I want to improve next
+
+This project taught me how to keep the API behavior while changing where its data lives. Next, I’m using Postgres and Docker Compose in Project 3 so the API and database can run together in containers.
+
