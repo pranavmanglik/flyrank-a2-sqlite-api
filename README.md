@@ -60,7 +60,7 @@ I expect to find “SQLite persistence test” after the restart. I also plan to
 
 ## Test screenshot
 
-I’ll place my screenshot here after I run the persistence check and inspect the database in DB Browser for SQLite.
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/78c6694e-fb8f-4e6c-bb95-dda1c1c996f8" />
 
 <!-- Add the screenshot here as assets/a2-sqlite-test.png when it is available in this project folder. -->
 
